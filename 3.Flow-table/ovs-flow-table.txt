@@ -1,0 +1,30 @@
+sudo ovs-ofctl add-flow s1 action=normal
+sudo ovs-ofctl dump-flows s1
+sudo ovs-ofctl del-flows s1
+sudo ovs-ofctl dump-flows s1
+sudo ovs-ofctl add-flow s1 in_port=1,action=output:2
+sudo ovs-ofctl add-flow s1 in_port=2,action=output:1
+sudo ovs-ofctl dump-flows s1
+sudo ovs-ofctl del-flows s1
+sudo ovs-ofctl dump-flows s1
+sudo ovs-ofctl add-flow s1 dl_dst=56:bb:30:8f:5b:1d,action=output:2
+sudo ovs-ofctl add-flow s1 dl_dst=ae:bb:83:6f:83:d7,action=output:1
+sudo ovs-ofctl add-flow s1 arp,action=normal
+sudo ovs-ofctl del-flows s1
+sudo ovs-ofctl add-flow s1 ip,nw_dst=10.0.0.1,action=output:1
+sudo ovs-ofctl add-flow s1 ip,nw_dst=10.0.0.2,action=output:2
+sudo ovs-ofctl add-flow s1 arp,action=normal
+sudo ovs-ofctl dump-flows s1
+sudo ovs-ofctl del-flows s1
+sudo ovs-ofctl add-flow s1 arp,action=normal
+echo "python3 -m http.server"
+echo "curl 10.0.0.2:8000"
+sudo ovs-ofctl add-flow s1 tcp,tp_dst=80,action=output:2
+sudo ovs-ofctl add-flow s1 ip,nw_src=10.0.0.2,action=output:1
+sudo ovs-ofctl del-flows s1
+sudo ovs-ofctl add-flow s1 priority=400,dl_dst=56:bb:30:8f:5b:1d,action=output:2
+sudo ovs-ofctl add-flow s1 priority=500,nw_dst=10.0.0.2,action=drop
+sudo ovs-ofctl add-flow s1 arp,action=normal
+sudo ovs-ofctl dump-flows s1
+sudo ovs-ofctl del-flows s1 ip
+sudo ovs-ofctl dump-flows s1

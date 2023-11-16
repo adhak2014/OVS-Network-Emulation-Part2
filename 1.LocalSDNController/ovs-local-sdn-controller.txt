@@ -1,0 +1,45 @@
+echo "Open vSwitch version"
+ovs-vsctl -V
+echo ""
+echo "List all running switches"
+ovs-vsctl list-br
+echo ""
+echo "List all ports within switch s1"
+ovs-vsctl list-ports s1
+echo ""
+echo "Display Open vSwitch interfaces configuration with ifconfig"
+ifconfig s1-eth1; ifconfig s1-eth2
+echo ""
+echo "Display a brief overview of the database contents"
+sudo ovs-vsctl show
+echo ""
+echo "Verify that the switch is operating as a standalone"
+ovs-vsctl get-fail-mode s1
+echo ""
+echo "Modify the switch fail-mode to secure"
+ovs-vsctl set-fail-mode s1 secure
+echo ""
+echo "Verify that the switch is operating in secure fail-mode"
+ovs-vsctl get-fail-mode s1
+echo ""
+echo "Dump the flow table of switch s1"
+ovs-ofctl dump-flows s1
+echo ""
+echo "Change the fail-mode of the switch back to standalone"
+ovs-vsctl set-fail-mode s1 standalone
+echo ""
+echo "Verify that the switch is operating in standalone"
+ovs-vsctl get-fail-mode s1
+echo ""
+echo "Display information pertaining to switch s1"
+ovs-ofctl show s1
+echo ""
+echo "Display the MAC addresss that were learned on switch s1"
+ovs-appctl fdb/show s1
+echo ""
+echo "Display flow information for all interfaces"
+ovs-ofctl dump-aggregate s1
+echo ""
+echo "Display statistics for the flow tables in switch s1"
+sudo ovs-ofctl dump-tables s1
+echo ""

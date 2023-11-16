@@ -1,0 +1,12 @@
+echo "*** Block network traffic fromo h3 to h1 ***"
+ovs-ofctl add-flow s1 "table=0,priority=40000,ip,nw_src=10.0.0.3,nw_dst=10.0.0.1,action=drop"
+echo "*** Switch s1 checks table 1 if there is any network traffic ***"
+ovs-ofctl add-flow s1 "table=0,action=goto_table=1"
+echo "*** Add a flow in table 1 of switch s1 for normal layer2/layer3 packet processing ***"
+ovs-ofctl add-flow s1 "table=1,action=normal"
+echo "*** Verify flows installation ***"
+ovs-ofctl dump-flows s1
+echo "*** Tracing the packets from h1 to h3 ***"
+ovs-appctl ofproto/trace s1 ip,nw_src=10.0.0.1,nw_dst=10.0.0.3,dl_src=00:00:00:00:00:01,dl_dst=00:00:00:00:00:03
+echo "*** Tracing the packets from h3 to h1 ***"
+ovs-appctl ofproto/trace s1 ip,nw_src=10.0.0.3,nw_dst=10.0.0.1,dl_src=00:00:00:00:00:03,dl_dst=00:00:00:00:00:01

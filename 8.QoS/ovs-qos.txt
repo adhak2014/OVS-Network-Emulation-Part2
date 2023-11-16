@@ -1,0 +1,76 @@
+echo "*** Display MAC address table of switch s1 ***"
+sudo ovs-appctl fdb/show s1
+ 
+echo "*** Display MAC address table of switch s2 ***"
+sudo ovs-appctl fdb/show s2
+ 
+echo "*** Using xterm h2 under Mininet CLI, run host h2 in iperf3 server mode at port tcp 5000 ***"
+iperf3 -s -p 5000 &
+ 
+echo "*** Set ingress policy rate of s1-eth1 to 10Mbps ***"
+sudo ovs-vsctl set interface s1-eth1 ingress_policing_rate=10000
+   
+echo "*** Using xterm h1 under Mininet CLI, run host h1 in iperf3 client mode ***"
+iperf3 -c 10.0.0.2 -p 5000
+ 
+echo "*** Delete QoS policy\n\n ***"
+sudo ovs-vsctl -- --all destroy QoS
+ 
+echo "*** Set ingress policy rate of s1-eth1 to 100Mbps ***"
+sudo ovs-vsctl set interface s1-eth1 ingress_policing_rate=100000
+   
+echo "*** Using xterm h1 under Mininet CLI, run host h1 in iperf3 client mode ***"
+iperf3 -c 10.0.0.2 -p 5000
+ 
+echo "*** Delete QoS policy ***"
+sudo ovs-vsctl -- --all destroy QoS
+ 
+echo "*** Set ingress policy rate of s1-eth1 to 500Mbps ***"
+sudo ovs-vsctl set interface s1-eth1 ingress_policing_rate=500000
+ 
+echo "*** Using xterm h1 under Mininet CLI, run host h1 in iperf3 client mode ***"
+iperf3 -c 10.0.0.2 -p 5000
+ 
+echo "*** Delete QoS policy ***"
+sudo ovs-vsctl -- --all destroy QoS
+
+echo "*** Display metering features supported by OVS ***"
+sudo ovs-ofctl -O OpenFlow15 meter-features s1
+
+echo "*** Add a meter in switch s1 and limit the rate to 300 Mbps ***"
+sudo ovs-ofctl -O OpenFlow15 add-meter s1 meter=1,kbps,band=type=drop,rate=300000
+sudo ovs-ofctl -O OpenFlow15 add-flow s1 tcp,tp_dst=5000,actions=meter:1,output:3
+sudo ovs-ofctl -O OpenFlow15 add-flow s1 tcp,tp_dst=8000,actions=meter:1,output:3
+    
+echo "*** Using xterm h4 under Mininet CLI, run host h4 in iperf3 server mode at port tcp 8000 ***"
+iperf3 -s -p 8000
+
+echo "The following two commands should be run in parallel"
+
+echo "*** Using xterm h1 under Mininet CLI, run host h1 in iperf3 client mode ***"
+iperf3 -c 10.0.0.2 -p 5000 -b 300mb
+    
+echo "*** Using xterm h3 under Mininet CLI, run h3 in iperf3 client mode ***" 
+iperf3 -c 10.0.0.4 -p 8000 -b 300mb
+
+echo "*** Delete QoS policy ***"
+sudo ovs-vsctl -- --all destroy QoS
+
+echo "*** Create a QoS shaping ***"
+sudo ovs-vsctl -- set port s1-eth3 qos=@newqos -- --id=@newqos create qos type=linux-htb other-config:max-rate=100000000 queues=1=@q1,2=@q2 -- --id=@q1 create queue other-config:min-rate=70000000 -- --id=@q2 create queue other-config:min-rate=30000000
+
+echo "*** Add a manual flow in the switch ***"
+sudo ovs-ofctl add-flow s1 tcp,tp_dst=5000,actions=set_queue:1,normal
+sudo ovs-ofctl add-flow s1 tcp,tp_dst=8000,actions=set_queue:2,normal
+    
+echo "*** Verify QoS configuration for interface s1-eth3 ***"
+sudo ovs-appctl -t ovs-vswitchd qos/show s1-eth3
+
+echo "The following two commands should be run in parallel"
+
+echo "*** Using xterm h1 under Mininet CLI, run host h1 in iperf3 client mode ***"
+iperf3 -c 10.0.0.2 -p 5000
+
+echo "*** Using xterm h3 under Mininet CLI, run host h3 in iperf3 client mode ***"
+iperf3 -c 10.0.0.4 -p 8000
+    

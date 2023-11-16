@@ -1,0 +1,5 @@
+ip route add 203.0.23.0/30 via 203.0.13.2 dev r1-eth1
+ip tunnel add tun0 mode gre remote 203.0.23.1 local 203.0.13.1 ttl 255
+ip link set tun0 up
+ip addr add 172.16.0.1/24 dev tun0
+ip route add 192.168.2.0/24 via 172.16.0.2 dev tun0

@@ -1,0 +1,15 @@
+echo ""
+
+echo "Dump Switch s1 Flows"
+echo ""
+ovs-ofctl dump-flows s1
+echo ""
+
+echo "Dump Switch s2 Flows"
+echo ""
+ovs-ofctl dump-flows s2
+echo ""
+
+echo "Dump Switch s3 Flows"
+echo ""
+ovs-ofctl dump-flows s3

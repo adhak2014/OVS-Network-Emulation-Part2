@@ -1,0 +1,14 @@
+echo "*** Assign switch s1 port s1-eth1 to VLAN 10 ***"
+ovs-vsctl set port s1-eth1 tag=10
+echo "*** Assign switch s1 port s1-eth2 to VLAN 20 ***"
+ovs-vsctl set port s1-eth2 tag=20
+echo "*** Assign switch s1 port s1-eth3 to VLAN 10 ***"
+ovs-vsctl set port s1-eth3 tag=10
+echo "*** Assign switch s1 port s1-eth4 to VLAN 20 ***"
+ovs-vsctl set port s1-eth4 tag=20
+
+echo "*** Display switch s1 content ***"
+sudo ovs-vsctl show
+
+echo "*** Display MAC address table ***"
+ovs-appctl fdb/show s1

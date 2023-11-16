@@ -1,0 +1,32 @@
+echo "*** Add a flow into table 0 in switch s1 to act as a normal layer2/layer3 switch ***"
+ovs-ofctl add-flow s1 "table=0,action=normal"
+
+echo "*** If host h1 generates network traffic to host h3, conntrack will start tracking the packet and the switch echo will check table 1 ***"
+ovs-ofctl add-flow s1 "table=0,priority=40000,ip,nw_src=10.0.0.1,nw_dst=10.0.0.3,ct_state=-trk,action=ct(table=1)"
+
+echo "*** If host h3 generates network traffic to host h1, conntrack will start tracking the packet and the switch echo will check table 1 ***"
+ovs-ofctl add-flow s1 "table=0,priority=40000,ip,nw_src=10.0.0.3,nw_dst=10.0.0.1,ct_state=-trk,action=ct(table=1)"
+
+echo "*** If host h1 generates network traffic to host h3, the switch s1 will forward the traffic to port 3 (s1-eth3) ***"
+ovs-ofctl add-flow s1 "table=1,ip,nw_src=10.0.0.1,nw_dst=10.0.0.3,ct_state=+trk+new,action=ct(commit),3"
+
+echo "*** If host h1 generates reply network traffic to host h3, the switch s1 will forward the traffic to port 3 (s1-eth3) ***"
+ovs-ofctl add-flow s1 "table=1,ip,nw_src=10.0.0.1,nw_dst=10.0.0.3,ct_state=+trk+est,action=output:3"
+
+echo "*** If host h3 generates a new network traffic to host h1, the switch s1 will drop the network traffic ***"
+ovs-ofctl add-flow s1 "table=1,ip,nw_src=10.0.0.3,nw_dst=10.0.0.1,ct_state=+trk+new,action=drop"
+
+echo "*** If host h3 generates reply network traffic to host h1, the switch s1 will forward the traffic to port 1 (s1-eth1) ***"
+ovs-ofctl add-flow s1 "table=1,ip,nw_src=10.0.0.3,nw_dst=10.0.0.1,ct_state=+trk+est,action=output:1"
+
+echo "*** Switch s1 dump flows ***"
+ovs-ofctl dump-flows s1
+
+echo "*** Show conntrack state table ***"
+ovs-dpctl dump-conntrack
+
+#echo "*** Install conntrack ***"
+#apt install conntrack
+
+echo "*** Show conntrack event updates ***"
+conntrack -E

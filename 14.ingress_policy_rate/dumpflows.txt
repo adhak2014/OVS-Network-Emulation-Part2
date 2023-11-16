@@ -1,0 +1,21 @@
+echo ""
+echo "Dump Switch s1 Flows"
+echo ""
+ovs-ofctl dump-flows s1
+echo ""
+echo "Dump Switch s2 Flows"
+echo ""
+ovs-ofctl dump-flows s2
+echo ""
+echo "Dump Switch s3 Flows"
+echo ""
+ovs-ofctl dump-flows s3
+echo ""
+echo "Display switch s1 interface s1-eth1 statistics"
+echo ""
+ovs-vsctl get interface s1-eth1 statistics
+echo ""
+echo "Display switch s1 interface s1-eth2 statistics"
+echo ""
+ovs-vsctl get interface s1-eth2 statistics
+echo ""

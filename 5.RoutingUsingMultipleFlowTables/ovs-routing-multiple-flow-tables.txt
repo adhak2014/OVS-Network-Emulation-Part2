@@ -1,0 +1,34 @@
+echo "************ Configure Switch s1 ************"
+ovs-ofctl dump-flows s1
+ifconfig s1 10.0.1.1/24 up
+ovs-ofctl add-flow s1 "table=0,arp,action=normal"
+ovs-ofctl add-flow s1 "table=0,ip,action=goto_table=1"
+echo "************ Configure Switch s2 ************"
+ovs-ofctl dump-flows s2
+ifconfig s2 10.0.2.1/24 up
+ovs-ofctl add-flow s2 "table=0,arp,action=normal"
+ovs-ofctl add-flow s2 "table=0,ip,action=goto_table=1"
+
+echo "************ Switch s1: Table1 - Layer 3 Forwarding ************"
+ovs-ofctl add-flow s1 "table=1,ip,nw_dst=10.0.1.10,action=mod_dl_src=00:00:00:00:00:05,mod_dl_dst=00:00:00:00:00:01,dec_ttl,goto_table=2"
+ovs-ofctl add-flow s1 "table=1,ip,nw_dst=10.0.2.0/24,action=mod_dl_src=00:00:00:00:00:01,mod_dl_dst=00:00:00:00:00:05,dec_ttl,goto_table=2"
+echo "************ Switch s2: Table1 - Layer 3 Forwarding ************"
+ovs-ofctl add-flow s2 "table=1,ip,nw_dst=10.0.2.10,action=mod_dl_src=00:00:00:00:00:06,mod_dl_dst=00:00:00:00:00:02,dec_ttl,goto_table=2"
+ovs-ofctl add-flow s2 "table=1,ip,nw_dst=10.0.1.0/24,action=mod_dl_src=00:00:00:00:00:02,mod_dl_dst=00:00:00:00:00:06,dec_ttl,goto_table=2"
+
+echo "************ Switch s1: Table2 - Layer 2 Forwarding ************"
+ovs-ofctl add-flow s1 "table=2,dl_dst=00:00:00:00:00:01,action=output:1"
+ovs-ofctl add-flow s1 "table=2,dl_dst=00:00:00:00:00:05,action=output:2"
+echo "************ Switch s2: Table2 - Layer 2 Forwarding ************"
+ovs-ofctl add-flow s2 "table=2,dl_dst=00:00:00:00:00:02,action=output:1"
+ovs-ofctl add-flow s2 "table=2,dl_dst=00:00:00:00:00:06,action=output:2"
+
+echo "************ Switch s1 Dump Flows ************"
+ovs-ofctl dump-flows s1
+echo "************ Switch s2 Dump Flows ************"
+ovs-ofctl dump-flows s2
+
+echo "************ h1 trace to h2 ************"
+ovs-appctl ofproto/trace s1 ip,nw_src=10.0.1.10,nw_dst=10.0.2.10,dl_src=00:00:00:00:00:01,nw_ttl=64
+echo "************ h2 trace to h1 ************"
+ovs-appctl ofproto/trace s2 ip,nw_src=10.0.2.10,nw_dst=10.0.1.10,dl_src=00:00:00:00:00:02,nw_ttl=64

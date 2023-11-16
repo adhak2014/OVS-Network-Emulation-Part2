@@ -1,0 +1,7 @@
+echo ""
+echo "Display queue statistics for s1-eth3 on switch s1"
+ovs-ofctl queue-stats s1 s1-eth3
+echo ""
+echo "Display queue statistics for s1-eth4 on switch s1"
+ovs-ofctl queue-stats s1 s1-eth4
+echo ""

@@ -1,0 +1,7 @@
+echo ""
+echo "Configure switch s1"
+echo ""
+ifconfig s1 192.168.1.1/24 up
+ovs-ofctl add-flow s1 arp,action=normal
+ovs-ofctl add-flow s1 ip,nw_src=10.0.0.1,nw_dst=10.0.0.2,action=output:2,output:3
+ovs-ofctl add-flow s1 ip,nw_src=10.0.0.2,nw_dst=10.0.0.1,action=output:1,output:3

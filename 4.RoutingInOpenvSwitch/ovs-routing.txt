@@ -1,0 +1,17 @@
+ovs-ofctl dump-flows s1
+ifconfig s1 10.0.1.1/24 up
+ovs-ofctl add-flow s1 arp,action=normal
+ovs-ofctl add-flow s1 ip,nw_dst=10.0.1.10,action=mod_dl_dst=00:00:00:00:00:01,output:1
+ovs-ofctl add-flow s1 ip,nw_dst=10.0.2.0/24,actions=mod_dl_src=00:00:00:00:00:03,mod_dl_dst=00:00:00:00:00:04,dec_ttl,output:2
+ovs-ofctl dump-flows s1
+echo "***************************************"
+ovs-ofctl dump-flows s2
+ifconfig s2 10.0.2.1/24 up
+ovs-ofctl add-flow s2 arp,action=normal
+ovs-ofctl add-flow s2 ip,nw_dst=10.0.2.10,action=mod_dl_dst=00:00:00:00:00:02,output:1
+ovs-ofctl add-flow s2 ip,nw_dst=10.0.1.0/24,actions=mod_dl_src=00:00:00:00:00:04,mod_dl_dst=00:00:00:00:00:03,dec_ttl,output:2
+ovs-ofctl dump-flows s2
+echo "***************************************"
+ovs-appctl ofproto/trace s1 in_port=1,ip,nw_src=10.0.1.10,nw_dst=10.0.2.10,dl_src=00:00:00:00:00:01,nw_ttl=64
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+ovs-appctl ofproto/trace s2 in_port=1,ip,nw_src=10.0.2.10,nw_dst=10.0.1.10,dl_src=00:00:00:00:00:02,nw_ttl=64

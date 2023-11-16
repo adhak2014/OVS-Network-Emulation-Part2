@@ -1,0 +1,23 @@
+echo "*** Configure VLANs ***"
+ovs-vsctl set port s1-eth1 tag=10
+ovs-vsctl set port s1-eth2 tag=20
+ovs-vsctl set port s2-eth1 tag=10
+ovs-vsctl set port s2-eth2 tag=20
+
+echo "*** Configure Trunks ***"
+ovs-vsctl set port s1-eth3 trunk=10,20
+ovs-vsctl set port s3-eth1 trunk=10,20
+ovs-vsctl set port s2-eth3 trunk=10,20
+ovs-vsctl set port s3-eth2 trunk=10,20
+
+echo "*** Display switches s1, s2, and s3 contents ***"
+ovs-vsctl show
+
+echo "*** Display MAC address table of switch s1 ***"
+ovs-appctl fdb/show s1
+    
+echo "*** Display MAC address table of switch s2 ***"
+ovs-appctl fdb/show s2
+
+echo "*** Display MAC address table of switch s3 ***"
+ovs-appctl fdb/show s3

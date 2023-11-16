@@ -1,0 +1,21 @@
+ovs-ofctl add-flow s1 "table=0,arp,action=normal"
+
+ovs-ofctl add-flow s1 "table=0,ip,action=goto_table=1"
+
+ovs-ofctl add-flow s1 "table=1,ip,dl_src=00:00:00:00:00:1,dl_dst=00:00:00:00:00:02,action=mod_dl_src=00:00:00:00:00:0A,goto_table=2"
+ovs-ofctl add-flow s1 "table=2,dl_src=00:00:00:00:00:0A,dl_dst=00:00:00:00:00:02,action=output:2"
+
+ovs-ofctl add-flow s1 "table=1,ip,dl_src=00:00:00:00:00:2,dl_dst=00:00:00:00:00:1,action=mod_dl_src=00:00:00:00:00:AA,goto_table=2"
+ovs-ofctl add-flow s1 "table=2,dl_src=00:00:00:00:00:AA,dl_dst=00:00:00:00:00:01,action=output:1"
+
+ovs-ofctl add-flow s1 "table=1,ip,dl_src=00:00:00:00:00:1,dl_dst=00:00:00:00:00:03,action=mod_dl_src=00:00:00:00:00:0B,goto_table=2"
+ovs-ofctl add-flow s1 "table=2,dl_src=00:00:00:00:00:0B,dl_dst=00:00:00:00:00:03,action=output:3"
+
+ovs-ofctl add-flow s1 "table=1,ip,dl_src=00:00:00:00:00:3,dl_dst=00:00:00:00:00:01,action=mod_dl_src=00:00:00:00:00:BB,goto_table=2"
+ovs-ofctl add-flow s1 "table=2,dl_src=00:00:00:00:00:BB,dl_dst=00:00:00:00:00:01,action=output:1"
+
+ovs-ofctl add-flow s1 "table=1,ip,dl_src=00:00:00:00:00:2,dl_dst=00:00:00:00:00:03,action=dec_ttl,dec_ttl,goto_table=2"
+ovs-ofctl add-flow s1 "table=2,dl_src=00:00:00:00:00:02,dl_dst=00:00:00:00:00:03,action=output:3"
+
+ovs-ofctl add-flow s1 "table=1,ip,dl_src=00:00:00:00:00:3,dl_dst=00:00:00:00:00:02,action=dec_ttl,goto_table=2"
+ovs-ofctl add-flow s1 "table=2,dl_src=00:00:00:00:00:03,dl_dst=00:00:00:00:00:02,action=output:2"
